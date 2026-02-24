@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+ fx:controller="sistemaGestionFront.controllers.GastoController">
+
+    <!-- ===== REGISTRO ===== -->
+    <top>
+        <VBox spacing="10" style="-fx-padding:15;">
+
+            <Label text="Registro de Gastos"
+                   style="-fx-font-size:20px;
+                          -fx-font-weight:bold;"/>
+
+            <HBox spacing="10">
+
+                <TextField fx:id="txtDescripcion"
+                           promptText="Descripción"
+                           prefWidth="250"/>
+
+                <TextField fx:id="txtMonto"
+                           promptText="Monto"/>
+
+                <ComboBox fx:id="comboCategoria"
+                          promptText="Categoría"
+                          prefWidth="150"/>
+
+                <Button text="Guardar"
+                        onAction="#guardarGasto"
+                        style="-fx-background-color:#c0392b;
+                               -fx-text-fill:white;"/>
+
+            </HBox>
+
+        </VBox>
+    </top>
+
+    <!-- ===== HISTORIAL ===== -->
+    <center>
+
+        <TableView fx:id="tablaGastos">
+
+            <columns>
+                <TableColumn text="ID" fx:id="colId"/>
+                <TableColumn text="Descripción" fx:id="colDescripcion"/>
+                <TableColumn text="Monto" fx:id="colMonto"/>
+                <TableColumn text="Fecha" fx:id="colFecha"/>
+            </columns>
+
+        </TableView>
+
+    </center>
+
+</BorderPane>

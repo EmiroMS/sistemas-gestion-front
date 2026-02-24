@@ -1,0 +1,53 @@
+.root {
+    -fx-background-color: #F2F2F2;
+}
+
+/* Tarjeta central */
+.login-card {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 60;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+
+    /* QUE OCUPE CASI TODA LA VENTANA */
+    -fx-pref-width: 80%;
+    -fx-pref-height: 80%;
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 25, 0, 0, 8);
+}
+
+
+
+/* Título */
+.title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7B1E1E;
+}
+
+/* Subtítulo */
+.subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #555;
+}
+
+/* Inputs */
+.input {
+    -fx-pref-width: 250;
+    -fx-padding: 8;
+    -fx-font-size: 14px;
+}
+
+/* Botón */
+.btn-login {
+    -fx-background-color: #7B1E1E;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+}
+
+.btn-login:hover {
+    -fx-background-color: #5E1616;
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sistemaGestionFront.controllers.HistorialController">
+
+    <top>
+        <HBox spacing="10" style="-fx-padding: 15;">
+            <Label text="Historial de Ventas"
+                   style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <DatePicker fx:id="fechaFiltro"/>
+            <Button text="Filtrar" onAction="#filtrar"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tablaVentas">
+            <columns>
+                <TableColumn text="ID" fx:id="colId"/>
+                <TableColumn text="Fecha" fx:id="colFecha"/>
+                <TableColumn text="Total" fx:id="colTotal"/>
+                <TableColumn text="Acciones" fx:id="colAcciones"/>
+            </columns>
+        </TableView>
+    </center>
+
+</BorderPane>

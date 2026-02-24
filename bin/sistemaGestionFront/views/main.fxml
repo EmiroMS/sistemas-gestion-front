@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sistemaGestionFront.controllers.MainController">
+
+    <!-- TOP BAR -->
+<top>
+    <HBox alignment="CENTER"
+          style="-fx-background-color: #7b1e1e; -fx-padding: 15;">
+        <Label text="LicoSoft HM - Sistema de Gestión"
+               style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;"/>
+    </HBox>
+</top>
+
+
+    <!-- LEFT MENU -->
+    <left>
+        <VBox spacing="12"
+              style="-fx-background-color: #2c2c2c; -fx-padding: 20;"
+              prefWidth="230">
+
+            <Button text="🏠 Inicio" onAction="#inicio" styleClass="menu-btn" prefWidth="190"/>
+            <Button text="📦 Productos" onAction="#productos" styleClass="menu-btn" prefWidth="190"/>
+            <Button text="💰 Ventas" onAction="#ventas" styleClass="menu-btn" prefWidth="190"/>
+            <Button text="📊 Inventario" onAction="#inventario" styleClass="menu-btn" prefWidth="190"/>
+            <Button text="📈 Reportes" onAction="#reportes" styleClass="menu-btn" prefWidth="190"/>
+            <Button text="💸 Gastos" onAction="#gastos" styleClass="menu-btn" prefWidth="190"/>
+            <Button text="🚪 Cerrar sesión" onAction="#logout" styleClass="menu-btn-logout" prefWidth="190"/>
+
+        </VBox>
+    </left>
+
+    <!-- CENTER CONTENT -->
+    <center>
+        <StackPane fx:id="contentArea"
+                   style="-fx-background-color: #f4f4f4;">
+            <Label text="Bienvenido a LicoSoft HM"
+                   style="-fx-font-size: 24px; -fx-text-fill: #555;"/>
+        </StackPane>
+    </center>
+
+</BorderPane>

@@ -44,7 +44,7 @@ public class LoginController {
     private void abrirPantallaPrincipal() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/sistemaGestionFront/views/principal.fxml")
+                getClass().getResource("/sistemaGestionFront/views/main.fxml")
             );
 
             Scene scene = new Scene(loader.load(), 1200, 700);

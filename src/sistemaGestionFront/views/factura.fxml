@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="sistemaGestionFront.controllers.FacturaController"
+      alignment="TOP_CENTER"
+      spacing="6"
+      prefWidth="300"
+      style="-fx-padding:15;
+             -fx-background-color:white;
+             -fx-font-family:monospace;">
+
+    <Label text="LICORERA HM"
+           style="-fx-font-size:16;
+                  -fx-font-weight:bold;"/>
+
+    <Label fx:id="lblFecha"/>
+    <Label fx:id="lblFactura"/>
+
+    <Separator/>
+
+    <VBox fx:id="boxItems" spacing="4"/>
+
+    <Separator/>
+
+    <Label fx:id="lblSubtotal"/>
+    <Label fx:id="lblDescuento"/>
+    <Label fx:id="lblTotal"
+           style="-fx-font-size:16;
+                  -fx-font-weight:bold;"/>
+
+    <Separator/>
+
+    <Label text="¡Gracias por su compra!"
+           style="-fx-font-size:12;"/>
+
+    <Button text="Imprimir Ticket"
+            onAction="#imprimirFactura"/>
+</VBox>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+ fx:controller="sistemaGestionFront.controllers.ReportesController">
+
+    <top>
+        <VBox spacing="10" style="-fx-padding:15;">
+
+            <Label text="Reporte de Ganancias"
+                   style="-fx-font-size:22px;
+                          -fx-font-weight:bold;"/>
+
+            <HBox spacing="10">
+
+                <DatePicker fx:id="fechaInicio"/>
+                <DatePicker fx:id="fechaFin"/>
+
+                <Button text="Consultar"
+                        onAction="#consultarReporte"/>
+
+            </HBox>
+
+        </VBox>
+    </top>
+
+    <center>
+        <GridPane hgap="20" vgap="20"
+                  style="-fx-padding:25;">
+
+            <Label text="Ventas Totales:" GridPane.rowIndex="0"/>
+            <Label fx:id="lblVentas"
+                   GridPane.columnIndex="1"/>
+
+            <Label text="Costo Productos:" GridPane.rowIndex="1"/>
+            <Label fx:id="lblCosto"
+                   GridPane.rowIndex="1"
+                   GridPane.columnIndex="1"/>
+
+            <Label text="Gastos:" GridPane.rowIndex="2"/>
+            <Label fx:id="lblGastos"
+                   GridPane.rowIndex="2"
+                   GridPane.columnIndex="1"/>
+
+            <Label text="Utilidad Bruta:" GridPane.rowIndex="3"/>
+            <Label fx:id="lblBruta"
+                   GridPane.rowIndex="3"
+                   GridPane.columnIndex="1"/>
+
+            <Label text="UTILIDAD NETA:"
+                   style="-fx-font-size:18px;
+                          -fx-font-weight:bold;"
+                   GridPane.rowIndex="4"/>
+
+            <Label fx:id="lblNeta"
+                   style="-fx-font-size:20px;
+                          -fx-text-fill:green;
+                          -fx-font-weight:bold;"
+                   GridPane.rowIndex="4"
+                   GridPane.columnIndex="1"/>
+
+        </GridPane>
+    </center>
+
+</BorderPane>

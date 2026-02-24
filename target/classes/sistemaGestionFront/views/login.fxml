@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="sistemaGestionFront.controllers.LoginController"
+           stylesheets="@../styles/login.css">
+
+    <VBox fx:id="root"
+          spacing="25"
+          alignment="CENTER"
+          styleClass="login-card"
+          maxWidth="Infinity"
+          maxHeight="Infinity">
+
+        <Label fx:id="title" text="LicoSoft HM" styleClass="title"/>
+        <Label text="Sistema de Gestión" styleClass="subtitle"/>
+
+        <TextField fx:id="txtUsuario"
+                   promptText="Usuario"
+                   styleClass="input"/>
+
+        <PasswordField fx:id="txtPassword"
+                       promptText="Contraseña"
+                       styleClass="input"/>
+
+        <Button text="Ingresar"
+                onAction="#login"
+                styleClass="btn-login"/>
+
+        <Label fx:id="lblMensaje"/>
+
+    </VBox>
+
+</StackPane>

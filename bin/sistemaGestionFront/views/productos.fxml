@@ -1,0 +1,25 @@
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="sistemaGestionFront.controllers.ProductoController">
+
+    <top>
+        <HBox spacing="10" style="-fx-padding: 15;">
+            <Label text="Gestión de Productos"
+                   style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <Button text="Nuevo producto" onAction="#nuevoProducto"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tablaProductos">
+            <columns>
+                <TableColumn text="Nombre" fx:id="colNombre"/>
+                <TableColumn text="Precio Venta" fx:id="colPrecioVenta"/>
+                <TableColumn text="Precio Costo" fx:id="colPrecioCosto"/>
+                <TableColumn text="Stock" fx:id="colStock"/>
+                <TableColumn text="Estado" fx:id="colEstado"/>
+                <TableColumn text="Acciones" fx:id="colAcciones"/>
+            </columns>
+        </TableView>
+    </center>
+
+</BorderPane>

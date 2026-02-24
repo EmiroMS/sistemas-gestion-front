@@ -1,0 +1,24 @@
+.menu-btn {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 15;
+    -fx-background-radius: 6;
+}
+
+.menu-btn:hover {
+    -fx-background-color: #555;
+}
+
+.menu-btn-logout {
+    -fx-background-color: #7b1e1e;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+}
+
+.menu-btn-logout:hover {
+    -fx-background-color: #a62828;
+}
