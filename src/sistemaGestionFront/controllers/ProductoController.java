@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import sistemaGestionFront.models.Producto;
 import sistemaGestionFront.services.ProductoService;
+import sistemaGestionFront.session.Sesion;
 
 public class ProductoController {
 
@@ -18,6 +19,8 @@ public class ProductoController {
     @FXML private TableColumn<Producto, Double> colPrecioCosto;
     @FXML private TableColumn<Producto, Integer> colStock;
     @FXML private TableColumn<Producto, String> colEstado;
+
+    @FXML private Button btnNuevoProducto;
 
     private final ProductoService service = new ProductoService();
 
@@ -32,7 +35,17 @@ public class ProductoController {
                 new SimpleStringProperty(c.getValue().getActivo() ? "Activo" : "Inactivo")
         );
 
-        agregarAcciones();
+        // SOLO ADMIN VE ACCIONES
+        if ("ADMIN".equals(Sesion.getRol())) {
+            agregarAcciones();
+        }
+
+        // VENDEDOR NO VE BOTON NUEVO PRODUCTO
+        if ("VENDEDOR".equals(Sesion.getRol())) {
+            btnNuevoProducto.setVisible(false);
+            btnNuevoProducto.setManaged(false);
+        }
+
         cargarProductos();
     }
 
@@ -70,6 +83,7 @@ public class ProductoController {
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
+
                 if (empty) {
                     setGraphic(null);
                 } else {

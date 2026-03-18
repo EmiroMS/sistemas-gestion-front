@@ -12,21 +12,39 @@
              -fx-background-color:white;
              -fx-font-family:monospace;">
 
-    <Label text="LICORERA HM"
+    <!-- EMPRESA -->
+    <Label fx:id="lblEmpresa"
+           text="LICOSOFT HM"
            style="-fx-font-size:16;
                   -fx-font-weight:bold;"/>
 
-    <Label fx:id="lblFecha"/>
-    <Label fx:id="lblFactura"/>
+    <Label fx:id="lblNit"
+           text="NIT: 900123456-7"/>
+
+    <Label text="Barranquilla - Colombia"/>
 
     <Separator/>
 
+    <!-- FACTURA -->
+    <Label fx:id="lblFactura"
+           style="-fx-font-weight:bold;"/>
+
+    <Label fx:id="lblFecha"/>
+
+    <Label fx:id="lblVendedor"/>
+
+    <Separator/>
+
+    <!-- ITEMS -->
     <VBox fx:id="boxItems" spacing="4"/>
 
     <Separator/>
 
+    <!-- TOTALES -->
     <Label fx:id="lblSubtotal"/>
+
     <Label fx:id="lblDescuento"/>
+
     <Label fx:id="lblTotal"
            style="-fx-font-size:16;
                   -fx-font-weight:bold;"/>
@@ -38,4 +56,5 @@
 
     <Button text="Imprimir Ticket"
             onAction="#imprimirFactura"/>
+
 </VBox>

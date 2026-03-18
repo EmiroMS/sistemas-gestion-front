@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="sistemaGestionFront.controllers.DashboardController"
+      spacing="20"
+      style="-fx-padding:20;">
+
+    <Label text="Dashboard del Negocio"
+           style="-fx-font-size:22; -fx-font-weight:bold;"/>
+
+    <!-- TARJETAS -->
+    <HBox spacing="20">
+
+        <VBox style="-fx-background-color:white; -fx-padding:15; -fx-border-color:#ddd;">
+            <Label text="Ventas Hoy"/>
+            <Label fx:id="lblVentasHoy"
+                   style="-fx-font-size:22; -fx-font-weight:bold;"/>
+        </VBox>
+
+        <VBox style="-fx-background-color:white; -fx-padding:15; -fx-border-color:#ddd;">
+            <Label text="Ganancia Hoy"/>
+            <Label fx:id="lblGananciaHoy"
+                   style="-fx-font-size:22; -fx-font-weight:bold;"/>
+        </VBox>
+
+    </HBox>
+
+    <!-- GRAFICA -->
+    <BarChart fx:id="chartVentas"
+              title="Ventas por Día"
+              prefHeight="300">
+
+        <xAxis>
+            <CategoryAxis label="Fecha"/>
+        </xAxis>
+
+        <yAxis>
+            <NumberAxis label="Total"/>
+        </yAxis>
+
+    </BarChart>
+
+    <!-- PIE CHART -->
+    <PieChart fx:id="chartProductos"
+              title="Productos más vendidos"
+              prefHeight="300"/>
+
+</VBox>

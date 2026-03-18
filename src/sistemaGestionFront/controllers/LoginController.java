@@ -8,6 +8,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import sistemaGestionFront.services.AuthService;
+import sistemaGestionFront.session.Sesion;
 
 public class LoginController {
 
@@ -22,6 +23,7 @@ public class LoginController {
 
     @FXML
     public void login() {
+
         String usuario = txtUsuario.getText();
         String password = txtPassword.getText();
 
@@ -34,7 +36,18 @@ public class LoginController {
         boolean ok = AuthService.login(usuario, password);
 
         if (ok) {
+
+            /*
+             IMPORTANTE
+             Aquí debes guardar el rol que venga de la API
+             ejemplo:
+             Sesion.setRol("ADMIN");
+             o
+             Sesion.setRol("VENDEDOR");
+            */
+
             abrirPantallaPrincipal();
+
         } else {
             lblMensaje.setText("Credenciales incorrectas");
             lblMensaje.setStyle("-fx-text-fill: red;");
@@ -43,6 +56,7 @@ public class LoginController {
 
     private void abrirPantallaPrincipal() {
         try {
+
             FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/sistemaGestionFront/views/main.fxml")
             );

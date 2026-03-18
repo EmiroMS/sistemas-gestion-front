@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="sistemaGestionFront.controllers.UsuarioFormController"
+      spacing="12"
+      style="-fx-padding:20;"
+      prefWidth="350">
+
+    <Label text="Nuevo Usuario"
+           style="-fx-font-size:18; -fx-font-weight:bold;"/>
+
+    <Label text="Nombre"/>
+    <TextField fx:id="txtNombre"/>
+
+    <Label text="Usuario"/>
+    <TextField fx:id="txtUsuario"/>
+
+    <Label text="Contraseña"/>
+    <PasswordField fx:id="txtPassword"/>
+
+    <Label text="Rol"/>
+    <ComboBox fx:id="comboRol"/>
+
+    <Button text="Guardar Usuario"
+            onAction="#guardarUsuario"/>
+
+</VBox>

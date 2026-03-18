@@ -6,14 +6,51 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import sistemaGestionFront.session.Sesion;
 
 public class MainController {
 
     @FXML
     private StackPane contentArea;
+
+    // BOTON REPORTES
+    @FXML
+    private Button btnReportes;
+
+    // BOTON USUARIOS
+    @FXML
+    private Button btnUsuarios;
+
+    // BOTON DASHBOARD
+    @FXML
+    private Button btnDashboard;
+
+    // ==========================
+    // INICIALIZAR
+    // ==========================
+    @FXML
+    public void initialize() {
+
+        // Si el usuario es vendedor ocultamos modulos ADMIN
+        if ("VENDEDOR".equals(Sesion.getRol())) {
+
+            // ocultar reportes
+            btnReportes.setVisible(false);
+            btnReportes.setManaged(false);
+
+            // ocultar usuarios
+            btnUsuarios.setVisible(false);
+            btnUsuarios.setManaged(false);
+
+            // ocultar dashboard
+            btnDashboard.setVisible(false);
+            btnDashboard.setManaged(false);
+        }
+    }
 
     // ==========================
     // INICIO
@@ -56,8 +93,25 @@ public class MainController {
         cargarVista("/sistemaGestionFront/views/gastos.fxml");
     }
 
+    // MODULO USUARIOS (SOLO ADMIN)
+    @FXML
+    public void usuarios() {
+        cargarVista("/sistemaGestionFront/views/usuarios.fxml");
+    }
+
+    // MODULO DASHBOARD (SOLO ADMIN)
+    @FXML
+    public void dashboard() {
+        cargarVista("/sistemaGestionFront/views/dashboard.fxml");
+    }
+    
+    @FXML
+    public void entradas() {
+        cargarVista("/sistemaGestionFront/views/entradaProductos.fxml");
+    }
+
     // ==========================
-    // ✅ LOGOUT REAL
+    // LOGOUT
     // ==========================
     @FXML
     public void logout() {
@@ -75,7 +129,6 @@ public class MainController {
 
                 try {
 
-                    // ventana actual
                     Stage stageActual =
                             (Stage) contentArea
                                     .getScene()
@@ -94,18 +147,14 @@ public class MainController {
 
                     loginStage.setTitle("Login - LicoSoft HM");
 
-                    // ✅ MISMO TAMAÑO QUE EL SISTEMA
                     loginStage.setScene(new Scene(root, 900, 600));
 
-                    // ✅ CENTRAR
                     loginStage.centerOnScreen();
 
-                    // opcional
                     loginStage.setResizable(false);
 
                     loginStage.show();
 
-                    // cerrar principal
                     stageActual.close();
 
                 } catch (Exception e) {
@@ -114,6 +163,7 @@ public class MainController {
             }
         });
     }
+
     // ==========================
     // CARGAR VISTAS
     // ==========================

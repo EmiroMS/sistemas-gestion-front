@@ -1,20 +1,26 @@
 package sistemaGestionFront.controllers;
 
 import javafx.fxml.FXML;
-import javafx.print.PrinterJob;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import sistemaGestionFront.session.Sesion;
 import sistemaGestionFront.utils.PdfGenerator;
 
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class FacturaController {
 
+    @FXML private Label lblEmpresa;
+    @FXML private Label lblNit;
     @FXML private Label lblFecha;
     @FXML private Label lblFactura;
+    @FXML private Label lblVendedor;
 
     @FXML private VBox boxItems;
 
@@ -22,8 +28,15 @@ public class FacturaController {
     @FXML private Label lblDescuento;
     @FXML private Label lblTotal;
 
-    // ✅ guardamos venta actual para PDF
     private Map<String,Object> ventaActual;
+
+    // formato moneda colombiana
+    private final NumberFormat moneda =
+            NumberFormat.getCurrencyInstance(new Locale("es","CO"));
+
+    // formato fecha
+    private final DateTimeFormatter formatoFecha =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // =====================================
     // CARGAR FACTURA
@@ -32,13 +45,30 @@ public class FacturaController {
 
         this.ventaActual = venta;
 
-        lblFactura.setText(
-                String.format("Factura #: %06d",
-                        ((Number)venta.get("id")).intValue())
-        );
+        // DATOS EMPRESA
+        lblEmpresa.setText("LICOSOFT HM");
+        lblNit.setText("NIT: 900123456-7");
+
+        // VENDEDOR
+        lblVendedor.setText("Vendedor: " + Sesion.getNombre());
+
+        int idVenta =
+                ((Number)venta.get("id")).intValue();
+
+        // NUMERO CONSECUTIVO
+        String numeroFactura =
+                String.format("%08d", idVenta);
+
+        lblFactura.setText("FACTURA POS #" + numeroFactura);
+
+        // FECHA
+        LocalDateTime fecha =
+                LocalDateTime.parse(
+                        venta.get("fecha").toString()
+                );
 
         lblFecha.setText(
-                "Fecha: " + venta.get("fecha")
+                "Fecha: " + fecha.format(formatoFecha)
         );
 
         List<Map<String,Object>> detalles =
@@ -73,8 +103,10 @@ public class FacturaController {
             Label linea2 =
                     new Label(
                             cantidad +
-                            " x $" + precio +
-                            "      $" + subtotal
+                            " x " +
+                            moneda.format(precio) +
+                            "        " +
+                            moneda.format(subtotal)
                     );
 
             boxItems.getChildren()
@@ -93,24 +125,33 @@ public class FacturaController {
                 ((Number)venta.get("totalFinal"))
                         .doubleValue();
 
-        lblSubtotal.setText("Subtotal: $" + subtotal);
-        lblDescuento.setText("Descuento: -$" + descuento);
-        lblTotal.setText("TOTAL: $" + total);
+        lblSubtotal.setText(
+                "SUBTOTAL: " +
+                moneda.format(subtotal)
+        );
+
+        lblDescuento.setText(
+                "DESCUENTO: -" +
+                moneda.format(descuento)
+        );
+
+        lblTotal.setText(
+                "TOTAL: " +
+                moneda.format(total)
+        );
     }
 
     // =====================================
-    // IMPRIMIR + GENERAR PDF ✅
+    // IMPRIMIR + PDF
     // =====================================
     @FXML
     private void imprimirFactura() {
 
         try {
 
-            // ✅ Generar PDF primero
             String rutaPDF =
                     PdfGenerator.generarFactura(ventaActual);
 
-            // ✅ Abrir PDF automáticamente
             java.awt.Desktop.getDesktop()
                     .open(new java.io.File(rutaPDF));
 

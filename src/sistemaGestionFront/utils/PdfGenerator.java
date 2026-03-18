@@ -2,9 +2,14 @@ package sistemaGestionFront.utils;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
+import sistemaGestionFront.session.Sesion;
 
 import java.io.FileOutputStream;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class PdfGenerator {
@@ -14,9 +19,20 @@ public class PdfGenerator {
 
         String ruta = "factura_" + venta.get("id") + ".pdf";
 
-        // ✅ TAMAÑO 80mm TERMICO
+        List<Map<String,Object>> detalles =
+                (List<Map<String,Object>>) venta.get("detalles");
+
+        // ======================
+        // ALTURA DINAMICA
+        // ======================
+
+        int items = detalles.size();
+
+        float altura =
+                250 + (items * 35); // se ajusta segun productos
+
         Rectangle ticket =
-                new Rectangle(226f, 800f);
+                new Rectangle(226f, altura);
 
         Document document =
                 new Document(ticket,5,5,5,5);
@@ -28,9 +44,14 @@ public class PdfGenerator {
 
         document.open();
 
-        // ======================
-        // FUENTES
-        // ======================
+        NumberFormat moneda =
+                NumberFormat.getCurrencyInstance(
+                        new Locale("es","CO"));
+
+        DateTimeFormatter formatoFecha =
+                DateTimeFormatter.ofPattern(
+                        "dd/MM/yyyy HH:mm");
+
         Font titulo =
                 new Font(Font.FontFamily.COURIER,10,Font.BOLD);
 
@@ -43,9 +64,10 @@ public class PdfGenerator {
         // ======================
         // ENCABEZADO
         // ======================
+
         Paragraph empresa =
                 new Paragraph(
-                        "LICOSOFT HM\nLICORERA",
+                        "LICOSOFT HM\nNIT: 900123456-7\nBarranquilla - Colombia",
                         titulo);
 
         empresa.setAlignment(Element.ALIGN_CENTER);
@@ -53,28 +75,56 @@ public class PdfGenerator {
 
         document.add(new Paragraph(" "));
 
+        int idVenta =
+                ((Number)venta.get("id")).intValue();
+
+        String numeroFactura =
+                String.format("%08d", idVenta);
+
         document.add(
                 new Paragraph(
-                        "Factura #: "
-                        + venta.get("id"),
+                        "FACTURA POS #" + numeroFactura,
                         normal));
+
+        LocalDateTime fecha =
+                LocalDateTime.parse(
+                        venta.get("fecha").toString());
 
         document.add(
                 new Paragraph(
                         "Fecha: "
-                        + venta.get("fecha"),
+                        + fecha.format(formatoFecha),
                         normal));
 
         document.add(
                 new Paragraph(
-                        "-----------------------------",
+                        "Vendedor: "
+                        + Sesion.getNombre(),
+                        normal));
+
+        document.add(
+                new Paragraph(
+                        "--------------------------------",
+                        normal));
+
+        document.add(
+                new Paragraph(
+                        "Producto",
+                        normal));
+
+        document.add(
+                new Paragraph(
+                        "Cant x Precio        Total",
+                        normal));
+
+        document.add(
+                new Paragraph(
+                        "--------------------------------",
                         normal));
 
         // ======================
         // PRODUCTOS
         // ======================
-        List<Map<String,Object>> detalles =
-                (List<Map<String,Object>>) venta.get("detalles");
 
         for(Map<String,Object> d : detalles){
 
@@ -95,25 +145,27 @@ public class PdfGenerator {
                     ((Number)d.get("subtotal"))
                             .doubleValue();
 
-            document.add(
-                    new Paragraph(nombre,normal));
+            document.add(new Paragraph(nombre, normal));
 
-            document.add(
-                    new Paragraph(
-                            cantidad+
-                            " x "+precio+
-                            "    "+subtotal,
-                            normal));
+            String linea = String.format(
+                    "%2d x %-10s %10s",
+                    cantidad,
+                    moneda.format(precio),
+                    moneda.format(subtotal)
+            );
+
+            document.add(new Paragraph(linea, normal));
         }
 
         document.add(
                 new Paragraph(
-                        "-----------------------------",
+                        "--------------------------------",
                         normal));
 
         // ======================
         // TOTALES
         // ======================
+
         double subtotal =
                 ((Number)venta.get("totalSinDescuento"))
                         .doubleValue();
@@ -128,20 +180,18 @@ public class PdfGenerator {
 
         document.add(
                 new Paragraph(
-                        "Subtotal: "+subtotal,
+                        "SUBTOTAL:      " + moneda.format(subtotal),
                         normal));
 
         document.add(
                 new Paragraph(
-                        "Descuento: -"+descuento,
+                        "DESCUENTO:    -" + moneda.format(descuento),
                         normal));
 
         Paragraph totalTxt =
                 new Paragraph(
-                        "TOTAL: "+total,
+                        "TOTAL:        " + moneda.format(total),
                         totalFont);
-
-        totalTxt.setAlignment(Element.ALIGN_CENTER);
 
         document.add(totalTxt);
 
@@ -149,7 +199,7 @@ public class PdfGenerator {
 
         Paragraph gracias =
                 new Paragraph(
-                        "GRACIAS POR SU COMPRA",
+                        "*** GRACIAS POR SU COMPRA ***",
                         titulo);
 
         gracias.setAlignment(Element.ALIGN_CENTER);

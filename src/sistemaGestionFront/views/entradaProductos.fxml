@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="sistemaGestionFront.controllers.EntradaController"
+      spacing="20"
+      style="-fx-padding:20;">
+
+    <Label text="Entradas de Inventario"
+           style="-fx-font-size:20; -fx-font-weight:bold;"/>
+
+    <!-- FORMULARIO -->
+    <HBox spacing="10">
+
+        <ComboBox fx:id="comboProducto"
+                  promptText="Producto"
+                  prefWidth="250"/>
+
+        <TextField fx:id="txtCantidad"
+                   promptText="Cantidad"/>
+
+        <Button text="Registrar Entrada"
+                onAction="#registrarEntrada"/>
+
+    </HBox>
+
+    <!-- HISTORIAL -->
+    <TableView fx:id="tablaEntradas">
+
+        <columns>
+
+            <TableColumn fx:id="colFecha"
+                         text="Fecha"
+                         prefWidth="150"/>
+
+            <TableColumn fx:id="colProducto"
+                         text="Producto"
+                         prefWidth="250"/>
+
+            <TableColumn fx:id="colCantidad"
+                         text="Cantidad"
+                         prefWidth="100"/>
+
+            <TableColumn fx:id="colPrecio"
+                         text="Precio"
+                         prefWidth="120"/>
+
+        </columns>
+
+    </TableView>
+
+</VBox>

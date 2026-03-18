@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="sistemaGestionFront.controllers.UsuarioController"
+      spacing="10"
+      style="-fx-padding:20;">
+
+    <HBox spacing="10">
+        <Label text="Usuarios"
+               style="-fx-font-size:18; -fx-font-weight:bold;"/>
+
+        <Button text="Nuevo Usuario"
+                onAction="#nuevoUsuario"/>
+    </HBox>
+
+    <TableView fx:id="tablaUsuarios">
+
+        <columns>
+
+            <TableColumn fx:id="colNombre" text="Nombre"/>
+
+            <TableColumn fx:id="colUsuario" text="Usuario"/>
+
+            <TableColumn fx:id="colRol" text="Rol"/>
+
+            <TableColumn fx:id="colEstado" text="Estado"/>
+
+     
+
+        </columns>
+
+    </TableView>
+
+</VBox>
