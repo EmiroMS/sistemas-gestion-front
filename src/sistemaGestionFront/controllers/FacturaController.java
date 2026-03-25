@@ -1,117 +1,125 @@
 package sistemaGestionFront.controllers;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import sistemaGestionFront.session.Sesion;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.Alert;
+
 import sistemaGestionFront.utils.PdfGenerator;
 
-import java.text.NumberFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.awt.Desktop;
+import java.io.File;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class FacturaController {
 
-    @FXML private Label lblEmpresa;
-    @FXML private Label lblNit;
-    @FXML private Label lblFecha;
     @FXML private Label lblFactura;
-    @FXML private Label lblVendedor;
-
-    @FXML private VBox boxItems;
+    @FXML private Label lblFecha;
+    @FXML private Label lblCliente;
 
     @FXML private Label lblSubtotal;
     @FXML private Label lblDescuento;
     @FXML private Label lblTotal;
 
+    @FXML private TableView<Map<String,Object>> tablaFactura;
+
+    @FXML private TableColumn<Map<String,Object>,String> colProducto;
+    @FXML private TableColumn<Map<String,Object>,Integer> colCantidad;
+    @FXML private TableColumn<Map<String,Object>,Double> colPrecio;
+    @FXML private TableColumn<Map<String,Object>,Double> colSubtotal;
+
     private Map<String,Object> ventaActual;
 
-    // formato moneda colombiana
-    private final NumberFormat moneda =
-            NumberFormat.getCurrencyInstance(new Locale("es","CO"));
-
-    // formato fecha
-    private final DateTimeFormatter formatoFecha =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // =====================================
     // CARGAR FACTURA
     // =====================================
-    public void cargarFactura(Map<String,Object> venta) {
+    public void cargarFactura(Map<String,Object> venta){
 
         this.ventaActual = venta;
 
-        // DATOS EMPRESA
-        lblEmpresa.setText("LICOSOFT HM");
-        lblNit.setText("NIT: 900123456-7");
-
-        // VENDEDOR
-        lblVendedor.setText("Vendedor: " + Sesion.getNombre());
-
-        int idVenta =
-                ((Number)venta.get("id")).intValue();
-
-        // NUMERO CONSECUTIVO
-        String numeroFactura =
-                String.format("%08d", idVenta);
-
-        lblFactura.setText("FACTURA POS #" + numeroFactura);
-
-        // FECHA
-        LocalDateTime fecha =
-                LocalDateTime.parse(
-                        venta.get("fecha").toString()
-                );
+        lblFactura.setText(
+                String.format("%06d",
+                ((Number)venta.get("id")).intValue())
+        );
 
         lblFecha.setText(
-                "Fecha: " + fecha.format(formatoFecha)
+                venta.get("fecha").toString()
         );
+
+        // ✅ CLIENTE CORREGIDO
+        Object cliente = venta.get("cliente");
+
+        if(cliente != null){
+
+            Map clienteMap =
+                    (Map) cliente;
+
+            lblCliente.setText(
+                    clienteMap.get("nombre")
+                    .toString()
+            );
+
+        }else{
+
+            lblCliente.setText(
+                    "CONSUMIDOR FINAL"
+            );
+
+        }
+
 
         List<Map<String,Object>> detalles =
                 (List<Map<String,Object>>) venta.get("detalles");
 
-        boxItems.getChildren().clear();
 
-        for (Map<String,Object> d : detalles) {
+        colProducto.setCellValueFactory(c ->
 
-            Map producto =
-                    (Map)d.get("producto");
+                new SimpleStringProperty(
 
-            String nombre =
-                    producto.get("nombre").toString();
+                        ((Map)c.getValue()
+                                .get("producto"))
+                                .get("nombre")
+                                .toString()
+                ));
 
-            int cantidad =
-                    ((Number)d.get("cantidad")).intValue();
 
-            double precio =
-                    ((Number)d.get("precioVendido"))
-                            .doubleValue();
+        colCantidad.setCellValueFactory(c ->
 
-            double subtotal =
-                    ((Number)d.get("subtotal"))
-                            .doubleValue();
+                new SimpleObjectProperty<>(
 
-            Label linea1 =
-                    new Label(nombre);
+                        ((Number)c.getValue()
+                                .get("cantidad"))
+                                .intValue()
+                ));
 
-            linea1.setStyle("-fx-font-weight:bold;");
 
-            Label linea2 =
-                    new Label(
-                            cantidad +
-                            " x " +
-                            moneda.format(precio) +
-                            "        " +
-                            moneda.format(subtotal)
-                    );
+        colPrecio.setCellValueFactory(c ->
 
-            boxItems.getChildren()
-                    .addAll(linea1, linea2);
-        }
+                new SimpleObjectProperty<>(
+
+                        ((Number)c.getValue()
+                                .get("precioVendido"))
+                                .doubleValue()
+                ));
+
+
+        colSubtotal.setCellValueFactory(c ->
+
+                new SimpleObjectProperty<>(
+
+                        ((Number)c.getValue()
+                                .get("subtotal"))
+                                .doubleValue()
+                ));
+
+
+        tablaFactura.getItems().setAll(detalles);
+
 
         double subtotal =
                 ((Number)venta.get("totalSinDescuento"))
@@ -125,43 +133,50 @@ public class FacturaController {
                 ((Number)venta.get("totalFinal"))
                         .doubleValue();
 
+
         lblSubtotal.setText(
-                "SUBTOTAL: " +
-                moneda.format(subtotal)
+                "Subtotal: $" + subtotal
         );
 
         lblDescuento.setText(
-                "DESCUENTO: -" +
-                moneda.format(descuento)
+                "Descuento: -$" + descuento
         );
 
         lblTotal.setText(
-                "TOTAL: " +
-                moneda.format(total)
+                "TOTAL: $" + total
         );
+
     }
 
+
     // =====================================
-    // IMPRIMIR + PDF
+    // GENERAR PDF REAL
     // =====================================
     @FXML
-    private void imprimirFactura() {
+    private void imprimirFactura(){
 
-        try {
+        try{
 
-            String rutaPDF =
-                    PdfGenerator.generarFactura(ventaActual);
+            String ruta =
+                    PdfGenerator.generarFactura(
+                            ventaActual
+                    );
 
-            java.awt.Desktop.getDesktop()
-                    .open(new java.io.File(rutaPDF));
+            Desktop.getDesktop().open(
+                    new File(ruta)
+            );
+
+        }
+        catch(Exception e){
+
+            e.printStackTrace();
 
             new Alert(
-                    Alert.AlertType.INFORMATION,
-                    "Factura lista para imprimir"
-            ).showAndWait();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+                    Alert.AlertType.ERROR,
+                    "Error generando PDF"
+            ).show();
         }
+
     }
+
 }

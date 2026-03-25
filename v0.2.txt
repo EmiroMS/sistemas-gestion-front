@@ -1,6 +1,0 @@
-Novedades
-
-1.Control de acceso basado en roles
-2. Dashboard
-3. administración de usuario
-4. entrada de stock

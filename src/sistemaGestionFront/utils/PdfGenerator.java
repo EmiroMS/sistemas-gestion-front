@@ -1,41 +1,43 @@
 package sistemaGestionFront.utils;
 
-import com.itextpdf.text.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+
 import sistemaGestionFront.session.Sesion;
 
 import java.io.FileOutputStream;
+
 import java.text.NumberFormat;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Locale;
 
 public class PdfGenerator {
 
-    public static String generarFactura(Map<String,Object> venta)
-            throws Exception {
+    public static String generarFactura(
+            Map<String,Object> venta)
+            throws Exception{
 
-        String ruta = "factura_" + venta.get("id") + ".pdf";
-
-        List<Map<String,Object>> detalles =
-                (List<Map<String,Object>>) venta.get("detalles");
-
-        // ======================
-        // ALTURA DINAMICA
-        // ======================
-
-        int items = detalles.size();
-
-        float altura =
-                250 + (items * 35); // se ajusta segun productos
-
-        Rectangle ticket =
-                new Rectangle(226f, altura);
+        String ruta =
+                "factura_"+venta.get("id")+".pdf";
 
         Document document =
-                new Document(ticket,5,5,5,5);
+                new Document(
+                        PageSize.LETTER,
+                        30,30,30,30
+                );
 
         PdfWriter.getInstance(
                 document,
@@ -46,125 +48,229 @@ public class PdfGenerator {
 
         NumberFormat moneda =
                 NumberFormat.getCurrencyInstance(
-                        new Locale("es","CO"));
+                        new Locale("es","CO")
+                );
 
-        DateTimeFormatter formatoFecha =
+        DateTimeFormatter formato =
                 DateTimeFormatter.ofPattern(
-                        "dd/MM/yyyy HH:mm");
+                        "dd/MM/yyyy HH:mm"
+                );
 
         Font titulo =
-                new Font(Font.FontFamily.COURIER,10,Font.BOLD);
+                new Font(
+                        Font.FontFamily.HELVETICA,
+                        16,
+                        Font.BOLD
+                );
 
         Font normal =
-                new Font(Font.FontFamily.COURIER,8);
+                new Font(
+                        Font.FontFamily.HELVETICA,
+                        10
+                );
 
-        Font totalFont =
-                new Font(Font.FontFamily.COURIER,10,Font.BOLD);
+        Font bold =
+                new Font(
+                        Font.FontFamily.HELVETICA,
+                        10,
+                        Font.BOLD
+                );
 
-        // ======================
+
+        // =========================
         // ENCABEZADO
-        // ======================
+        // =========================
 
-        Paragraph empresa =
+        PdfPTable header =
+                new PdfPTable(2);
+
+        header.setWidthPercentage(100);
+
+        PdfPCell empresa =
+                new PdfPCell();
+
+        empresa.setBorder(0);
+
+        empresa.addElement(
+                new Paragraph("LICORERA HM",titulo));
+
+        empresa.addElement(
+                new Paragraph("NIT: 900123xxx",normal));
+
+        empresa.addElement(
+                new Paragraph("Nechí, Antioquia, Colombia",normal));
+
+        empresa.addElement(
+                new Paragraph("Tel: 3112330002",normal));
+
+
+        PdfPCell facturaBox =
+                new PdfPCell();
+
+        facturaBox.setPadding(10);
+
+        facturaBox.addElement(
+                new Paragraph("FACTURA",titulo));
+
+        facturaBox.addElement(
                 new Paragraph(
-                        "LICOSOFT HM\nNIT: 900123456-7\nBarranquilla - Colombia",
-                        titulo);
-
-        empresa.setAlignment(Element.ALIGN_CENTER);
-        document.add(empresa);
-
-        document.add(new Paragraph(" "));
-
-        int idVenta =
-                ((Number)venta.get("id")).intValue();
-
-        String numeroFactura =
-                String.format("%08d", idVenta);
-
-        document.add(
-                new Paragraph(
-                        "FACTURA POS #" + numeroFactura,
-                        normal));
+                        "No: "+
+                        String.format("%06d",
+                                ((Number)venta.get("id")).intValue())
+                )
+        );
 
         LocalDateTime fecha =
                 LocalDateTime.parse(
-                        venta.get("fecha").toString());
+                        venta.get("fecha").toString()
+                );
 
-        document.add(
+        facturaBox.addElement(
                 new Paragraph(
-                        "Fecha: "
-                        + fecha.format(formatoFecha),
-                        normal));
+                        "Fecha: "+
+                        fecha.format(formato)
+                )
+        );
 
-        document.add(
-                new Paragraph(
-                        "Vendedor: "
-                        + Sesion.getNombre(),
-                        normal));
+        header.addCell(empresa);
+        header.addCell(facturaBox);
 
-        document.add(
-                new Paragraph(
-                        "--------------------------------",
-                        normal));
+        document.add(header);
 
-        document.add(
-                new Paragraph(
-                        "Producto",
-                        normal));
+        document.add(new Paragraph("\n"));
 
-        document.add(
-                new Paragraph(
-                        "Cant x Precio        Total",
-                        normal));
 
-        document.add(
-                new Paragraph(
-                        "--------------------------------",
-                        normal));
+        // =========================
+        // CLIENTE CORREGIDO
+        // =========================
 
-        // ======================
-        // PRODUCTOS
-        // ======================
+        PdfPTable cliente =
+                new PdfPTable(2);
 
-        for(Map<String,Object> d : detalles){
+        cliente.setWidthPercentage(100);
+
+        Object clienteObj =
+                venta.get("cliente");
+
+        String nombreCliente =
+                "CONSUMIDOR FINAL";
+
+        if(clienteObj!=null){
+
+            // si viene como Map
+            if(clienteObj instanceof Map){
+
+                Map clienteMap =
+                        (Map)clienteObj;
+
+                nombreCliente =
+                        clienteMap.get("nombre")
+                        .toString();
+
+            }
+            else{
+
+                // si viene como String
+                String texto =
+                        clienteObj.toString();
+
+                if(texto.contains("nombre=")){
+
+                    nombreCliente =
+                            texto.split("nombre=")[1]
+                            .split(",")[0];
+
+                }else{
+
+                    nombreCliente = texto;
+
+                }
+
+            }
+
+        }
+
+        cliente.addCell("Cliente");
+
+        cliente.addCell(nombreCliente);
+
+        cliente.addCell("Vendedor");
+
+        cliente.addCell(
+                Sesion.getNombre()
+        );
+
+        document.add(cliente);
+
+        document.add(new Paragraph("\n"));
+
+
+        // =========================
+        // TABLA PRODUCTOS
+        // =========================
+
+        PdfPTable tabla =
+                new PdfPTable(4);
+
+        tabla.setWidthPercentage(100);
+
+        tabla.setWidths(
+                new int[]{4,1,2,2}
+        );
+
+        tabla.addCell(
+                new Phrase("Descripción",bold));
+
+        tabla.addCell(
+                new Phrase("Cant",bold));
+
+        tabla.addCell(
+                new Phrase("Precio",bold));
+
+        tabla.addCell(
+                new Phrase("Total",bold));
+
+
+        List<Map<String,Object>> detalles =
+                (List<Map<String,Object>>)
+                        venta.get("detalles");
+
+
+        for(Map<String,Object> d:detalles){
 
             Map producto =
                     (Map)d.get("producto");
 
-            String nombre =
-                    producto.get("nombre").toString();
+            tabla.addCell(
+                    producto.get("nombre")
+                            .toString());
 
-            int cantidad =
-                    ((Number)d.get("cantidad")).intValue();
+            tabla.addCell(
+                    String.valueOf(
+                            d.get("cantidad")
+                    ));
 
-            double precio =
-                    ((Number)d.get("precioVendido"))
-                            .doubleValue();
+            tabla.addCell(
+                    moneda.format(
+                            ((Number)d.get("precioVendido"))
+                                    .doubleValue()
+                    ));
 
-            double subtotal =
-                    ((Number)d.get("subtotal"))
-                            .doubleValue();
-
-            document.add(new Paragraph(nombre, normal));
-
-            String linea = String.format(
-                    "%2d x %-10s %10s",
-                    cantidad,
-                    moneda.format(precio),
-                    moneda.format(subtotal)
-            );
-
-            document.add(new Paragraph(linea, normal));
+            tabla.addCell(
+                    moneda.format(
+                            ((Number)d.get("subtotal"))
+                                    .doubleValue()
+                    ));
         }
 
-        document.add(
-                new Paragraph(
-                        "--------------------------------",
-                        normal));
+        document.add(tabla);
 
-        // ======================
+        document.add(new Paragraph("\n"));
+
+
+        // =========================
         // TOTALES
-        // ======================
+        // =========================
 
         double subtotal =
                 ((Number)venta.get("totalSinDescuento"))
@@ -178,33 +284,65 @@ public class PdfGenerator {
                 ((Number)venta.get("totalFinal"))
                         .doubleValue();
 
-        document.add(
-                new Paragraph(
-                        "SUBTOTAL:      " + moneda.format(subtotal),
-                        normal));
 
-        document.add(
-                new Paragraph(
-                        "DESCUENTO:    -" + moneda.format(descuento),
-                        normal));
+        PdfPTable totales =
+                new PdfPTable(2);
 
-        Paragraph totalTxt =
-                new Paragraph(
-                        "TOTAL:        " + moneda.format(total),
-                        totalFont);
+        totales.setWidthPercentage(40);
 
-        document.add(totalTxt);
+        totales.setHorizontalAlignment(
+                Element.ALIGN_RIGHT);
+
+        totales.addCell("Subtotal");
+
+        totales.addCell(
+                moneda.format(subtotal));
+
+        totales.addCell("Descuento");
+
+        totales.addCell(
+                moneda.format(descuento));
+
+        totales.addCell("TOTAL");
+
+        PdfPCell totalCell =
+                new PdfPCell(
+                        new Phrase(
+                                moneda.format(total),
+                                new Font(
+                                        Font.FontFamily.HELVETICA,
+                                        14,
+                                        Font.BOLD
+                                )
+                        )
+                );
+
+        totales.addCell(totalCell);
+
+        document.add(totales);
+
+
+        // =========================
+        // PIE
+        // =========================
 
         document.add(new Paragraph("\n"));
 
-        Paragraph gracias =
+        Paragraph legal =
                 new Paragraph(
-                        "*** GRACIAS POR SU COMPRA ***",
-                        titulo);
+                        "Factura generada por LicoSoft HM",
+                        new Font(
+                                Font.FontFamily.HELVETICA,
+                                8
+                        )
+                );
 
-        gracias.setAlignment(Element.ALIGN_CENTER);
+        legal.setAlignment(
+                Element.ALIGN_CENTER
+        );
 
-        document.add(gracias);
+        document.add(legal);
+
 
         document.close();
 

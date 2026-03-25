@@ -1,5 +1,6 @@
 package sistemaGestionFront.controllers;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -11,8 +12,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
 import javafx.util.converter.DoubleStringConverter;
+
+import sistemaGestionFront.models.Cliente;
 import sistemaGestionFront.models.ItemVenta;
 import sistemaGestionFront.models.Producto;
+
+import sistemaGestionFront.services.ClienteService;
 import sistemaGestionFront.services.ProductoService;
 import sistemaGestionFront.services.VentaService;
 
@@ -21,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 public class VentaController {
+
+    @FXML private TextField txtCliente;
+    @FXML private ListView<Cliente> listaClientes;
 
     @FXML private ComboBox<Producto> comboProductos;
     @FXML private TextField txtCantidad;
@@ -35,29 +43,139 @@ public class VentaController {
 
     @FXML private Label lblTotal;
 
-    private final ProductoService productoService = new ProductoService();
-    private final VentaService ventaService = new VentaService();
+    private ProductoService productoService =
+            new ProductoService();
 
-    private final List<ItemVenta> carrito = new ArrayList<>();
+    private VentaService ventaService =
+            new VentaService();
+
+    private ClienteService clienteService =
+            new ClienteService();
+
+    private final List<ItemVenta> carrito =
+            new ArrayList<>();
 
 
-    // ===================================================
-    // INIT
-    // ===================================================
+
     @FXML
-    public void initialize() {
+    public void initialize(){
 
         tablaVenta.setEditable(true);
+
         tablaVenta.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS
         );
 
+        cargarClientes();
         cargarProductos();
+
         configurarColumnas();
         configurarAcciones();
+
     }
 
-    private void cargarProductos() {
+
+
+    // =====================================
+    // CLIENTES AUTOCOMPLETE ESTABLE
+    // =====================================
+    private void cargarClientes(){
+
+        listaClientes.setVisible(false);
+        listaClientes.setManaged(false);
+        listaClientes.setPrefHeight(0);
+
+        listaClientes.setCellFactory(lv ->
+                new ListCell<>(){
+
+                    @Override
+                    protected void updateItem(Cliente c, boolean empty){
+
+                        super.updateItem(c, empty);
+
+                        setText(
+                                empty ? null :
+                                c.getNombre()
+                        );
+
+                    }
+
+                });
+
+
+        txtCliente.textProperty()
+        .addListener((obs,oldVal,newVal)->{
+
+            if(newVal==null){
+                return;
+            }
+
+            if(newVal.trim().length()<2){
+
+                listaClientes.setVisible(false);
+                listaClientes.setManaged(false);
+                listaClientes.setPrefHeight(0);
+
+                return;
+            }
+
+            new Thread(()->{
+
+                List<Cliente> encontrados =
+                        clienteService.buscar(newVal.trim());
+
+                Platform.runLater(()->{
+
+                    if(encontrados.isEmpty()){
+
+                        listaClientes.setVisible(false);
+                        listaClientes.setManaged(false);
+                        listaClientes.setPrefHeight(0);
+
+                        return;
+                    }
+
+                    listaClientes.getItems().setAll(encontrados);
+
+                    listaClientes.setManaged(true);
+                    listaClientes.setVisible(true);
+                    listaClientes.setPrefHeight(120);
+
+                });
+
+            }).start();
+
+        });
+
+
+        listaClientes.setOnMouseClicked(e->{
+
+            Cliente cliente =
+                    listaClientes.getSelectionModel()
+                    .getSelectedItem();
+
+            if(cliente!=null){
+
+                txtCliente.setText(
+                        cliente.getNombre()
+                );
+
+                listaClientes.setVisible(false);
+                listaClientes.setManaged(false);
+                listaClientes.setPrefHeight(0);
+
+            }
+
+        });
+
+    }
+
+
+
+    // =====================================
+    // PRODUCTOS
+    // =====================================
+    private void cargarProductos(){
 
         comboProductos.setItems(
                 FXCollections.observableArrayList(
@@ -65,32 +183,54 @@ public class VentaController {
                 )
         );
 
-        comboProductos.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(Producto item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty ? null : item.getNombre());
-            }
-        });
+        comboProductos.setCellFactory(lv ->
+                new ListCell<>(){
 
-        comboProductos.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Producto item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty ? null : item.getNombre());
-            }
-        });
+                    @Override
+                    protected void updateItem(
+                            Producto item,
+                            boolean empty){
+
+                        super.updateItem(item, empty);
+
+                        setText(
+                                empty ? null :
+                                item.getNombre()
+                        );
+                    }
+                });
+
+        comboProductos.setButtonCell(
+                new ListCell<>(){
+
+                    @Override
+                    protected void updateItem(
+                            Producto item,
+                            boolean empty){
+
+                        super.updateItem(item, empty);
+
+                        setText(
+                                empty ? null :
+                                item.getNombre()
+                        );
+                    }
+                });
+
     }
 
 
-    // ===================================================
+
+    // =====================================
     // COLUMNAS
-    // ===================================================
-    private void configurarColumnas() {
+    // =====================================
+    private void configurarColumnas(){
 
         colProducto.setCellValueFactory(c ->
                 new SimpleStringProperty(
-                        c.getValue().getProducto().getNombre()
+                        c.getValue()
+                        .getProducto()
+                        .getNombre()
                 ));
 
         colCantidad.setCellValueFactory(c ->
@@ -98,10 +238,10 @@ public class VentaController {
                         c.getValue().getCantidad()
                 ));
 
-        // ✅ PRECIO EDITABLE
         colPrecio.setCellValueFactory(c ->
                 new SimpleObjectProperty<>(
-                        c.getValue().getPrecioUnitario()
+                        c.getValue()
+                        .getPrecioUnitario()
                 ));
 
         colPrecio.setCellFactory(
@@ -112,81 +252,119 @@ public class VentaController {
 
         colPrecio.setOnEditCommit(event -> {
 
-            ItemVenta item = event.getRowValue();
-            Double nuevoPrecio = event.getNewValue();
+            ItemVenta item =
+                    event.getRowValue();
 
-            if (nuevoPrecio == null || nuevoPrecio <= 0) {
-                mostrarMensaje("Precio inválido");
+            Double nuevoPrecio =
+                    event.getNewValue();
+
+            if(nuevoPrecio==null ||
+               nuevoPrecio<=0){
+
+                mostrarMensaje(
+                        "Precio inválido"
+                );
+
                 tablaVenta.refresh();
+
                 return;
             }
 
-            item.setPrecioUnitario(nuevoPrecio);
+            item.setPrecioUnitario(
+                    nuevoPrecio
+            );
 
             calcularTotal();
+
             tablaVenta.refresh();
+
         });
 
         colTotal.setCellValueFactory(c ->
                 new SimpleObjectProperty<>(
                         c.getValue().getTotal()
                 ));
+
     }
 
 
-    // ===================================================
+
+    // =====================================
     // BOTON QUITAR
-    // ===================================================
-    private void configurarAcciones() {
+    // =====================================
+    private void configurarAcciones(){
 
         colAcciones.setCellFactory(param ->
-                new TableCell<>() {
+                new TableCell<>(){
 
-            private final Button btnQuitar = new Button("❌");
+                    private final Button btnQuitar =
+                            new Button("❌");
 
-            {
-                btnQuitar.setOnAction(e -> {
+                    {
+                        btnQuitar.setOnAction(e -> {
 
-                    ItemVenta item =
-                            getTableView()
+                            ItemVenta item =
+                                    getTableView()
                                     .getItems()
                                     .get(getIndex());
 
-                    carrito.remove(item);
-                    actualizarTabla();
+                            carrito.remove(item);
+
+                            actualizarTabla();
+
+                        });
+                    }
+
+                    @Override
+                    protected void updateItem(
+                            Void item,
+                            boolean empty){
+
+                        super.updateItem(item, empty);
+
+                        setGraphic(
+                                empty ? null :
+                                btnQuitar
+                        );
+
+                    }
                 });
-            }
 
-            @Override
-            protected void updateItem(Void item,
-                                      boolean empty) {
-
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : btnQuitar);
-            }
-        });
     }
 
 
-    // ===================================================
+
+    // =====================================
     // AGREGAR PRODUCTO
-    // ===================================================
+    // =====================================
     @FXML
-    private void agregarProducto() {
+    private void agregarProducto(){
 
-        Producto producto = comboProductos.getValue();
+        Producto producto =
+                comboProductos.getValue();
 
-        if (producto == null ||
-                txtCantidad.getText().isEmpty()) {
+        if(producto==null ||
+           txtCantidad.getText().isEmpty()){
 
-            mostrarMensaje("Seleccione producto y cantidad");
+            mostrarMensaje(
+                    "Seleccione producto y cantidad"
+            );
+
             return;
         }
 
-        int cantidad = Integer.parseInt(txtCantidad.getText());
+        int cantidad =
+                Integer.parseInt(
+                        txtCantidad.getText()
+                );
 
-        if (cantidad > producto.getStock()) {
-            mostrarMensaje("Stock insuficiente");
+        if(cantidad >
+           producto.getStock()){
+
+            mostrarMensaje(
+                    "Stock insuficiente"
+            );
+
             return;
         }
 
@@ -199,98 +377,152 @@ public class VentaController {
         );
 
         actualizarTabla();
+
         txtCantidad.clear();
+
     }
 
 
-    // ===================================================
-    // ACTUALIZAR TABLA
-    // ===================================================
-    private void actualizarTabla() {
+
+    private void actualizarTabla(){
 
         tablaVenta.setItems(
-                FXCollections.observableArrayList(carrito)
+                FXCollections.observableArrayList(
+                        carrito
+                )
         );
 
         calcularTotal();
+
     }
 
 
-    // ===================================================
-    // TOTAL GENERAL
-    // ===================================================
-    private void calcularTotal() {
+
+    private void calcularTotal(){
 
         double total =
                 carrito.stream()
-                        .mapToDouble(ItemVenta::getTotal)
+                        .mapToDouble(
+                                ItemVenta::getTotal
+                        )
                         .sum();
 
-        lblTotal.setText(String.format("%.2f", total));
+        lblTotal.setText(
+                String.format("%.2f",total)
+        );
+
     }
 
 
-    // ===================================================
-    // CONFIRMAR VENTA
-    // ===================================================
-    @FXML
-    private void confirmarVenta() {
 
-        if (carrito.isEmpty()) {
-            mostrarMensaje("No hay productos");
+    // =====================================
+    // CONFIRMAR VENTA
+    // =====================================
+    @FXML
+    private void confirmarVenta(){
+
+        if(carrito.isEmpty()){
+
+            mostrarMensaje(
+                    "No hay productos"
+            );
+
             return;
         }
 
-        Map<String,Object> venta =
-                ventaService.enviarVenta(carrito);
+        String nombreCliente =
+                txtCliente.getText();
 
-        if (venta != null) {
+        if(nombreCliente.isBlank()){
+
+            nombreCliente =
+                    "CONSUMIDOR FINAL";
+
+        }
+
+        Map<String,Object> venta =
+                ventaService.enviarVenta(
+                        carrito,
+                        nombreCliente
+                );
+
+        if(venta!=null){
 
             mostrarFactura(venta);
 
             carrito.clear();
+
             actualizarTabla();
+
+            txtCliente.clear();
+
+            listaClientes.setVisible(false);
+            listaClientes.setManaged(false);
+            listaClientes.setPrefHeight(0);
+
             lblTotal.setText("0.0");
 
-        } else {
-            mostrarMensaje("Error registrando venta");
         }
+        else{
+
+            mostrarMensaje(
+                    "Error registrando venta"
+            );
+
+        }
+
     }
 
 
-    // ===================================================
-    // FACTURA
-    // ===================================================
-    private void mostrarFactura(Map<String,Object> venta) {
 
-        try {
+    private void mostrarFactura(
+            Map<String,Object> venta){
+
+        try{
 
             FXMLLoader loader =
                     new FXMLLoader(
-                            getClass().getResource(
-                                    "/sistemaGestionFront/views/factura.fxml"
-                            ));
+                    getClass().getResource(
+                    "/sistemaGestionFront/views/factura.fxml"
+                    ));
 
-            Parent root = loader.load();
+            Parent root =
+                    loader.load();
 
             FacturaController controller =
                     loader.getController();
 
             controller.cargarFactura(venta);
 
-            Stage stage = new Stage();
+            Stage stage =
+                    new Stage();
+
             stage.setTitle("Factura");
-            stage.setScene(new Scene(root));
+
+            stage.setScene(
+                    new Scene(root)
+            );
+
             stage.show();
 
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+        catch(Exception e){
+
+            e.printStackTrace();
+
+        }
+
     }
 
 
-    private void mostrarMensaje(String mensaje) {
-        new Alert(Alert.AlertType.INFORMATION, mensaje)
-                .showAndWait();
+
+    private void mostrarMensaje(String mensaje){
+
+        new Alert(
+                Alert.AlertType.INFORMATION,
+                mensaje
+        ).showAndWait();
+
     }
+
 }

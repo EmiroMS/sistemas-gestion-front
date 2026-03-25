@@ -14,118 +14,176 @@ public class VentaService {
     private static final String BASE_URL =
             "http://localhost:8080/api/ventas";
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper =
+            new ObjectMapper();
+
 
     // =====================================
-    // REGISTRAR VENTA
+    // REGISTRAR VENTA (CON CLIENTE)
     // =====================================
-    public Map<String, Object> enviarVenta(List<ItemVenta> carrito) {
+    public Map<String,Object> enviarVenta(
+            List<ItemVenta> carrito,
+            String cliente){
 
-        try {
+        try{
 
-            URL url = new URL(BASE_URL);
+            URL url =
+                    new URL(BASE_URL);
+
             HttpURLConnection conn =
                     (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
+
+            conn.setRequestProperty(
+                    "Content-Type",
+                    "application/json"
+            );
+
             conn.setDoOutput(true);
 
-            List<Map<String, Object>> items = new ArrayList<>();
 
-            for (ItemVenta item : carrito) {
+            List<Map<String,Object>> items =
+                    new ArrayList<>();
 
-                Map<String, Object> map = new HashMap<>();
-                map.put("productoId",
-                        item.getProducto().getId());
-                map.put("cantidad",
-                        item.getCantidad());
-                map.put("totalVendido",
-                        item.getTotal());
+            for(ItemVenta item : carrito){
+
+                Map<String,Object> map =
+                        new HashMap<>();
+
+                map.put(
+                        "productoId",
+                        item.getProducto().getId()
+                );
+
+                map.put(
+                        "cantidad",
+                        item.getCantidad()
+                );
+
+                map.put(
+                        "totalVendido",
+                        item.getTotal()
+                );
 
                 items.add(map);
             }
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("items", items);
 
-            String json = mapper.writeValueAsString(body);
+            Map<String,Object> body =
+                    new HashMap<>();
 
-            OutputStream os = conn.getOutputStream();
+            body.put("items",items);
+
+            // ✅ NUEVO
+            body.put("cliente",cliente);
+
+
+            String json =
+                    mapper.writeValueAsString(body);
+
+
+            OutputStream os =
+                    conn.getOutputStream();
+
             os.write(json.getBytes());
+
             os.flush();
+
             os.close();
 
-            if (conn.getResponseCode() == 200) {
 
-                InputStream is = conn.getInputStream();
-                return mapper.readValue(is, Map.class);
+            if(conn.getResponseCode()==200){
+
+                InputStream is =
+                        conn.getInputStream();
+
+                return mapper.readValue(
+                        is,
+                        Map.class
+                );
             }
 
-        } catch (Exception e) {
+        }catch(Exception e){
             e.printStackTrace();
         }
 
         return null;
     }
 
+
     // =====================================
     // LISTAR TODAS LAS VENTAS
     // =====================================
-    public List<Map<String, Object>> listarVentas() {
+    public List<Map<String,Object>> listarVentas(){
 
-        try {
+        try{
 
-            URL url = new URL(BASE_URL);
+            URL url =
+                    new URL(BASE_URL);
+
             HttpURLConnection conn =
                     (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("GET");
 
-            if (conn.getResponseCode() == 200) {
+            if(conn.getResponseCode()==200){
 
-                InputStream is = conn.getInputStream();
-                return mapper.readValue(is, List.class);
+                InputStream is =
+                        conn.getInputStream();
+
+                return mapper.readValue(
+                        is,
+                        List.class
+                );
             }
 
-        } catch (Exception e) {
+        }catch(Exception e){
             e.printStackTrace();
         }
 
         return new ArrayList<>();
     }
 
-    // =====================================
-    // FILTRAR POR FECHA (RANGO)
-    // =====================================
-    public List<Map<String, Object>> filtrarVentas(
-            String fechaInicio,
-            String fechaFin) {
 
-        try {
+    // =====================================
+    // FILTRAR POR FECHA
+    // =====================================
+    public List<Map<String,Object>> filtrarVentas(
+            String fechaInicio,
+            String fechaFin){
+
+        try{
 
             String urlFiltro =
-                    BASE_URL +
-                    "/filtrar?fechaInicio=" + fechaInicio +
-                    "&fechaFin=" + fechaFin;
+                    BASE_URL+
+                    "/filtrar?fechaInicio="+fechaInicio+
+                    "&fechaFin="+fechaFin;
 
-            URL url = new URL(urlFiltro);
+            URL url =
+                    new URL(urlFiltro);
 
             HttpURLConnection conn =
                     (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("GET");
 
-            if (conn.getResponseCode() == 200) {
+            if(conn.getResponseCode()==200){
 
-                InputStream is = conn.getInputStream();
-                return mapper.readValue(is, List.class);
+                InputStream is =
+                        conn.getInputStream();
+
+                return mapper.readValue(
+                        is,
+                        List.class
+                );
             }
 
-        } catch (Exception e) {
+        }catch(Exception e){
             e.printStackTrace();
         }
 
         return new ArrayList<>();
     }
+
 }

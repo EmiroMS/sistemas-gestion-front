@@ -2,59 +2,135 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="sistemaGestionFront.controllers.FacturaController"
+      spacing="12"
       alignment="TOP_CENTER"
-      spacing="6"
-      prefWidth="300"
-      style="-fx-padding:15;
-             -fx-background-color:white;
-             -fx-font-family:monospace;">
+      style="-fx-padding:30; -fx-background-color:white;">
 
     <!-- EMPRESA -->
-    <Label fx:id="lblEmpresa"
-           text="LICOSOFT HM"
-           style="-fx-font-size:16;
-                  -fx-font-weight:bold;"/>
+    <VBox alignment="CENTER">
 
-    <Label fx:id="lblNit"
-           text="NIT: 900123456-7"/>
+        <Label text="LICORERA HM"
+               style="-fx-font-size:24; -fx-font-weight:bold;"/>
 
-    <Label text="Barranquilla - Colombia"/>
+        <Label text="NIT: 123456789"/>
 
-    <Separator/>
+        <Label text="Barranquilla - Colombia"/>
 
-    <!-- FACTURA -->
-    <Label fx:id="lblFactura"
-           style="-fx-font-weight:bold;"/>
+        <Label text="Tel: 3112330002"/>
 
-    <Label fx:id="lblFecha"/>
+    </VBox>
 
-    <Label fx:id="lblVendedor"/>
 
     <Separator/>
 
-    <!-- ITEMS -->
-    <VBox fx:id="boxItems" spacing="4"/>
+
+    <!-- INFO FACTURA -->
+    <GridPane hgap="40" vgap="5">
+
+        <Label text="Factura:"
+               GridPane.rowIndex="0"
+               GridPane.columnIndex="0"/>
+
+        <Label fx:id="lblFactura"
+               GridPane.rowIndex="0"
+               GridPane.columnIndex="1"/>
+
+
+        <Label text="Fecha:"
+               GridPane.rowIndex="1"
+               GridPane.columnIndex="0"/>
+
+        <Label fx:id="lblFecha"
+               GridPane.rowIndex="1"
+               GridPane.columnIndex="1"/>
+
+
+        <Label text="Cliente:"
+               GridPane.rowIndex="2"
+               GridPane.columnIndex="0"/>
+
+        <Label fx:id="lblCliente"
+               GridPane.rowIndex="2"
+               GridPane.columnIndex="1"/>
+
+    </GridPane>
+
 
     <Separator/>
+
+
+    <!-- TABLA -->
+    <TableView fx:id="tablaFactura"
+               prefHeight="300">
+
+        <columns>
+
+            <TableColumn text="Producto"
+                         fx:id="colProducto"
+                         prefWidth="220"/>
+
+            <TableColumn text="Cant"
+                         fx:id="colCantidad"
+                         prefWidth="60"/>
+
+            <TableColumn text="Precio"
+                         fx:id="colPrecio"
+                         prefWidth="100"/>
+
+            <TableColumn text="Subtotal"
+                         fx:id="colSubtotal"
+                         prefWidth="120"/>
+
+        </columns>
+
+    </TableView>
+
+
+    <Separator/>
+
 
     <!-- TOTALES -->
-    <Label fx:id="lblSubtotal"/>
+    <VBox alignment="CENTER_RIGHT"
+          spacing="5"
+          prefWidth="400">
 
-    <Label fx:id="lblDescuento"/>
+        <Label fx:id="lblSubtotal"
+               style="-fx-font-size:14;"/>
 
-    <Label fx:id="lblTotal"
-           style="-fx-font-size:16;
-                  -fx-font-weight:bold;"/>
+        <Label fx:id="lblDescuento"
+               style="-fx-font-size:14; -fx-text-fill:red;"/>
+
+        <Label fx:id="lblTotal"
+               style="-fx-font-size:20;
+                      -fx-font-weight:bold;
+                      -fx-text-fill:green;"/>
+
+    </VBox>
+
 
     <Separator/>
 
-    <Label text="¡Gracias por su compra!"
-           style="-fx-font-size:12;"/>
 
-    <Button text="Imprimir Ticket"
-            onAction="#imprimirFactura"/>
+    <!-- FOOTER -->
+    <VBox alignment="CENTER"
+          spacing="5">
+
+        <Label text="Gracias por su compra"
+               style="-fx-font-size:14;"/>
+
+        <Label text="Sistema LicoSoft HM"/>
+
+    </VBox>
+
+
+    <Button text="Imprimir"
+            onAction="#imprimirFactura"
+            style="-fx-background-color:#27ae60;
+                   -fx-text-fill:white;
+                   -fx-font-weight:bold;"/>
 
 </VBox>
